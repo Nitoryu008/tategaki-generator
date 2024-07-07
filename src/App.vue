@@ -18,19 +18,9 @@ const image = ref(null);
 const image_url = ref("");
 const text_renderer = ref(null);
 const padding = ref(10);
-const line_height = computed(() => {
-  return text_renderer.value.offsetWidth / text.value.split(/\n/).length - 1 + "px";
-});
+const line_height = ref("20px");
 
-const font_size = computed(() => {
-  const lines = text.value.split(/\n/);
-  let max_length = 0;
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-    if (line.length > max_length) max_length = line.length;
-  }
-  return text_renderer.value.offsetHeight / max_length - 4 + "px";
-});
+const font_size = ref("20px");
 
 function setImage() {
   let image_src = image.value.files[0];
@@ -61,6 +51,30 @@ function generate() {
       link.click();
     });
 }
+
+function render() {
+  line_height.value =
+    text_renderer.value.offsetWidth / text.value.split(/\n/).length - 1 + "px";
+
+  const lines = text.value.split(/\n/);
+  let max_length = 0;
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    if (line.length > max_length) max_length = line.length;
+  }
+  font_size.value = text_renderer.value.offsetHeight / max_length - 4 + "px";
+}
+
+onMounted(() => {
+  render();
+
+  const resizeObserver = new ResizeObserver(() => {
+    render();
+  });
+  if (text_renderer.value) {
+    resizeObserver.observe(text_renderer.value);
+  }
+});
 </script>
 
 <template>
@@ -84,7 +98,7 @@ function generate() {
         class="textarea is-block mx-auto"
         :rows="text.split(/\n/).length"
       ></textarea>
-      <input class="input is-hidden" type="number" v-model="padding">
+      <input class="input is-hidden" type="number" v-model="padding" />
       <div class="wrapper image mx-auto my-6 is-4by3" ref="wrapper">
         <div class="result has-background-black" id="result">
           <div class="text-wrapper">
@@ -102,7 +116,10 @@ function generate() {
         画像をダウンロード
       </button>
       <p>Developed by Nito(<a href="https://x.com/nito_008">@nito_008</a>)</p>
-      <p class="mb-4">Source code on <a href="https://github.com/Nitoryu008/tategaki-generator">GitHub</a></p>
+      <p class="mb-4">
+        Source code on
+        <a href="https://github.com/Nitoryu008/tategaki-generator">GitHub</a>
+      </p>
     </div>
   </main>
 </template>

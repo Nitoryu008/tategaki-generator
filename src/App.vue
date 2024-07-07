@@ -19,8 +19,8 @@ const image_url = ref("");
 const text_renderer = ref(null);
 const padding = ref(10);
 const line_height = ref("20px");
-
 const font_size = ref("20px");
+const generated_src = ref("");
 
 function setImage() {
   let image_src = image.value.files[0];
@@ -32,10 +32,8 @@ function click() {
 }
 
 function generate() {
-  const link = document.createElement("a");
   const result = document.getElementById("result");
   const scale = 1600 / result.clientWidth;
-  console.log(result.clientWidth, result.clientHeight);
   domtoimage
     .toPng(result, {
       width: result.clientWidth * scale,
@@ -45,11 +43,17 @@ function generate() {
         transformOrigin: "top left",
       },
     })
-    .then(function (dataUrl) {
-      link.href = dataUrl;
-      link.download = `result.png`;
-      link.click();
+    .then((dataUrl) => {
+      generated_src.value = dataUrl;
+      console.log(dataUrl);
     });
+}
+
+function download() {
+  const link = document.createElement("a");
+  link.href = generated_src;
+  link.download = `tategaki.png`;
+  link.click();
 }
 
 function render() {
@@ -63,6 +67,8 @@ function render() {
     if (line.length > max_length) max_length = line.length;
   }
   font_size.value = text_renderer.value.offsetHeight / max_length - 4 + "px";
+
+  generate();
 }
 
 onMounted(() => {
@@ -111,10 +117,16 @@ onMounted(() => {
           </div>
           <img :src="image_url" v-if="image_url" />
         </div>
+        <img
+          class="generated is-block mx-auto mb-6"
+          :src="generated_src"
+          v-if="generated_src"
+        />
       </div>
-      <button class="button is-primary mb-6" @click="generate">
+      <button class="button is-primary mb-5" @click="download">
         画像をダウンロード
       </button>
+      <p class="mb-6">※iOSの場合は画像を長押し→写真に保存</p>
       <p>Developed by Nito(<a href="https://x.com/nito_008">@nito_008</a>)</p>
       <p class="mb-4">
         Source code on
@@ -136,8 +148,8 @@ main {
 
 .wrapper {
   max-width: 500px;
-  position: relative;
   overflow: hidden;
+  position: relative;
 
   p {
     font-family: "Noto Serif JP Variable", serif;
@@ -150,12 +162,26 @@ main {
     z-index: 1;
     width: 100%;
     height: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
   img {
     position: relative;
     z-index: 0;
     object-fit: cover;
+    user-select: none;
+  }
+
+  .generated {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 500px;
+    z-index: 2;
+    user-select: none;
   }
 }
 

@@ -1,6 +1,6 @@
 <script setup>
 import domtoimage from "dom-to-image";
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import "@fontsource-variable/noto-serif-jp";
 
 const text = ref(
@@ -20,7 +20,7 @@ const text_renderer = ref(null);
 const padding = ref(10);
 const line_height = ref("20px");
 const font_size = ref("20px");
-const generated_src = ref("");
+const generated_url = ref("");
 
 function setImage() {
   let image_src = image.value.files[0];
@@ -31,7 +31,7 @@ function click() {
   image.value.click();
 }
 
-function generate() {
+function generate(callback) {
   const result = document.getElementById("result");
   const scale = 1600 / result.clientWidth;
   domtoimage
@@ -44,16 +44,23 @@ function generate() {
       },
     })
     .then((dataUrl) => {
-      generated_src.value = dataUrl;
-      console.log(dataUrl);
+      callback(dataUrl);
     });
 }
 
 function download() {
-  const link = document.createElement("a");
-  link.href = generated_src;
-  link.download = `tategaki.png`;
-  link.click();
+  generate((dataUrl) => {
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = `tategaki.png`;
+    link.click();
+  });
+}
+
+function showImage() {
+  generate((dataUrl) => {
+    generated_url.value = dataUrl;
+  });
 }
 
 function render() {
@@ -67,8 +74,6 @@ function render() {
     if (line.length > max_length) max_length = line.length;
   }
   font_size.value = text_renderer.value.offsetHeight / max_length - 4 + "px";
-
-  generate();
 }
 
 onMounted(() => {
@@ -85,7 +90,7 @@ onMounted(() => {
 
 <template>
   <main class="mt-6 has-text-centered mx-auto">
-    <div class="mx-3">
+    <div class="mx-3 is-centered">
       <h1 class="title">縦書き画像ジェネレータ</h1>
       <br />
       <input
@@ -117,16 +122,18 @@ onMounted(() => {
           </div>
           <img :src="image_url" v-if="image_url" />
         </div>
-        <img
-          class="generated is-block mx-auto mb-6"
-          :src="generated_src"
-          v-if="generated_src"
-        />
       </div>
-      <button class="button is-primary mb-5" @click="download">
+      <button class="button is-primary mb-5 is-block mx-auto" @click="download">
         画像をダウンロード
       </button>
-      <p class="mb-6">※iOSの場合は画像を長押し→写真に保存</p>
+      <button
+        class="button is-primary mb-6 is-block mx-auto"
+        @click="showImage"
+      >
+        画像を表示
+      </button>
+      <img :src="generated_url" class="generated" v-if="generated_url"/>
+      <p class="mb-6">iOSは画像を表示→出てくる画像を長押し→写真に保存</p>
       <p>Developed by Nito(<a href="https://x.com/nito_008">@nito_008</a>)</p>
       <p class="mb-4">
         Source code on
@@ -162,27 +169,19 @@ main {
     z-index: 1;
     width: 100%;
     height: 100%;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
   }
 
   img {
     position: relative;
     z-index: 0;
     object-fit: cover;
-    user-select: none;
   }
+}
 
-  .generated {
-    position: absolute;
-    top: 0;
-    left: 0;
-    max-width: 500px;
-    z-index: 2;
-    user-select: none;
-  }
+.generated {
+  max-width: 500px;
+  width: 100%;
+  object-fit: contain;
 }
 
 .text-wrapper {

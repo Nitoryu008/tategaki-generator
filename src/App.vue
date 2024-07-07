@@ -1,6 +1,6 @@
 <script setup>
 import domtoimage from "dom-to-image";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import "@fontsource-variable/noto-serif-jp";
 
 const text = ref(
@@ -17,7 +17,6 @@ const text = ref(
 const image = ref(null);
 const image_url = ref("");
 const text_renderer = ref(null);
-const padding = ref(10);
 const line_height = ref("20px");
 const font_size = ref("20px");
 const generated_url = ref("");
@@ -86,6 +85,10 @@ onMounted(() => {
     resizeObserver.observe(text_renderer.value);
   }
 });
+
+watch(text, () => {
+  render();
+})
 </script>
 
 <template>
@@ -106,10 +109,10 @@ onMounted(() => {
       </button>
       <textarea
         v-model="text"
+        @change="render"
         class="textarea is-block mx-auto"
         :rows="text.split(/\n/).length"
       ></textarea>
-      <input class="input is-hidden" type="number" v-model="padding" />
       <div class="wrapper image mx-auto my-6 is-4by3" ref="wrapper">
         <div class="result has-background-black" id="result">
           <div class="text-wrapper">
@@ -132,7 +135,7 @@ onMounted(() => {
       >
         画像を表示
       </button>
-      <img :src="generated_url" class="generated" v-if="generated_url"/>
+      <img :src="generated_url" class="generated" v-if="generated_url" />
       <p class="mb-6">iOSは画像を表示→出てくる画像を長押し→写真に保存</p>
       <p>Developed by Nito(<a href="https://x.com/nito_008">@nito_008</a>)</p>
       <p class="mb-4">

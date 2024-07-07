@@ -1,6 +1,6 @@
 <script setup>
 import domtoimage from "dom-to-image";
-import { ref, computed, nextTick } from "vue";
+import { ref, computed, onMounted } from "vue";
 import "@fontsource-variable/noto-serif-jp";
 
 const text = ref(
@@ -18,7 +18,6 @@ const image = ref(null);
 const image_url = ref("");
 const text_renderer = ref(null);
 const padding = ref(10);
-
 const line_height = computed(() => {
   return text_renderer.value.offsetWidth / text.value.split(/\n/).length - 1 + "px";
 });
@@ -103,7 +102,7 @@ function generate() {
         画像をダウンロード
       </button>
       <p>Developed by Nito(<a href="https://x.com/nito_008">@nito_008</a>)</p>
-      <p class="mb-4">Source code on <a href="">GitHub</a></p>
+      <p class="mb-4">Source code on <a href="https://github.com/Nitoryu008/tategaki-generator">GitHub</a></p>
     </div>
   </main>
 </template>
@@ -152,14 +151,5 @@ main {
 .result {
   width: 100%;
   height: 100%;
-}
-
-@media screen and (max-width: calc(500px + 12px * 2 - 1px)) {
-  .wrapper {
-    p {
-      font-size: 7vw;
-      line-height: 15vw;
-    }
-  }
 }
 </style>

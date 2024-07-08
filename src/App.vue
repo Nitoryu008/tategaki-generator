@@ -72,7 +72,8 @@ function render() {
     let line = lines[i];
     if (line.length > max_length) max_length = line.length;
   }
-  font_size.value = text_renderer.value.offsetHeight / max_length - 4 + "px";
+  
+  font_size.value = text_renderer.value.offsetHeight / max_length + "px";
 }
 
 onMounted(() => {
@@ -167,6 +168,7 @@ main {
     line-height: v-bind(line_height);
     -ms-writing-mode: tb-rl;
     writing-mode: vertical-rl;
+    text-orientation: upright;
     white-space: pre-wrap;
     position: relative;
     z-index: 1;

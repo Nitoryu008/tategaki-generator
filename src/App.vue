@@ -22,7 +22,8 @@ const font_size = ref("20px");
 const generated_url = ref("");
 const brightness = ref(100);
 const text_color = ref("#FFFFFF");
-const bg_color = ref("#000000")
+const bg_color = ref("#000000");
+const show_detail_setting = ref(false);
 
 function setImage() {
   let image_src = image.value.files[0];
@@ -79,6 +80,10 @@ function render() {
   font_size.value = text_renderer.value.offsetHeight / max_length + "px";
 }
 
+function toggleDetailSetting() {
+  show_detail_setting.value = !show_detail_setting.value;
+}
+
 onMounted(() => {
   render();
 
@@ -117,47 +122,40 @@ watch(text, () => {
         class="textarea is-block mx-auto"
         :rows="text.split(/\n/).length"
       ></textarea>
-      <button class="button is-info my-5">詳細設定</button>
-      <div class="field">
-        <label class="label">テキストの色</label>
-        <div class="control">
-          <input
-            class="input"
-            type="color"
-            v-model="text_color"
-          />
+      <button class="button is-info my-5" @click="toggleDetailSetting">
+        詳細設定
+      </button>
+      <form v-if="show_detail_setting" class="mb-5">
+        <div class="field">
+          <label class="label">テキストの色</label>
+          <div class="control">
+            <input class="input" type="color" v-model="text_color" />
+          </div>
         </div>
-      </div>
-      <div class="field">
-        <label class="label">背景の色</label>
-        <div class="control">
-          <input
-            class="input"
-            type="color"
-            v-model="bg_color"
-          />
+        <div class="field">
+          <label class="label">背景の色</label>
+          <div class="control">
+            <input class="input" type="color" v-model="bg_color" />
+          </div>
         </div>
-      </div>
-      <div class="field">
-        <label class="label">背景画像の明るさ</label>
-        <div class="control">
-          <input
-            class="input"
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            v-model="brightness"
-          />
+        <div class="field">
+          <label class="label">背景画像の明るさ</label>
+          <div class="control">
+            <input
+              class="input"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              v-model="brightness"
+            />
+          </div>
         </div>
-      </div>
-      <div class="wrapper image mx-auto my-6 is-4by3" ref="wrapper">
+      </form>
+      <div class="wrapper image mx-auto mb-6 is-4by3" ref="wrapper">
         <div class="result" id="result">
           <div class="text-wrapper">
-            <p
-              class="has-text-left has-text-weight-bold"
-              ref="text_renderer"
-            >
+            <p class="has-text-left has-text-weight-bold" ref="text_renderer">
               {{ text }}
             </p>
           </div>

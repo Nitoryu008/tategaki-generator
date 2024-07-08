@@ -20,6 +20,9 @@ const text_renderer = ref(null);
 const line_height = ref("20px");
 const font_size = ref("20px");
 const generated_url = ref("");
+const brightness = ref(100);
+const text_color = ref("#FFFFFF");
+const bg_color = ref("#000000")
 
 function setImage() {
   let image_src = image.value.files[0];
@@ -72,7 +75,7 @@ function render() {
     let line = lines[i];
     if (line.length > max_length) max_length = line.length;
   }
-  
+
   font_size.value = text_renderer.value.offsetHeight / max_length + "px";
 }
 
@@ -89,7 +92,7 @@ onMounted(() => {
 
 watch(text, () => {
   render();
-})
+});
 </script>
 
 <template>
@@ -114,11 +117,45 @@ watch(text, () => {
         class="textarea is-block mx-auto"
         :rows="text.split(/\n/).length"
       ></textarea>
+      <button class="button is-info my-5">詳細設定</button>
+      <div class="field">
+        <label class="label">テキストの色</label>
+        <div class="control">
+          <input
+            class="input"
+            type="color"
+            v-model="text_color"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">背景の色</label>
+        <div class="control">
+          <input
+            class="input"
+            type="color"
+            v-model="bg_color"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">背景画像の明るさ</label>
+        <div class="control">
+          <input
+            class="input"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            v-model="brightness"
+          />
+        </div>
+      </div>
       <div class="wrapper image mx-auto my-6 is-4by3" ref="wrapper">
-        <div class="result has-background-black" id="result">
+        <div class="result" id="result">
           <div class="text-wrapper">
             <p
-              class="has-text-left has-text-weight-bold has-text-white"
+              class="has-text-left has-text-weight-bold"
               ref="text_renderer"
             >
               {{ text }}
@@ -174,12 +211,14 @@ main {
     z-index: 1;
     width: 100%;
     height: 100%;
+    color: v-bind(text_color);
   }
 
   img {
     position: relative;
     z-index: 0;
     object-fit: cover;
+    filter: brightness(v-bind('brightness + "%"'));
   }
 }
 
@@ -198,5 +237,6 @@ main {
 .result {
   width: 100%;
   height: 100%;
+  background-color: v-bind(bg_color);
 }
 </style>
